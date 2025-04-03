@@ -239,6 +239,69 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     _onScaleEnd(ScaleEndDetails());
   }
 
+  void _onTapUp(TapUpDetails details) {
+    if (widget.decoration.onTapUp != null) {
+      widget.decoration.onTapUp!(details);
+    }
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    if (widget.decoration.onTapDown != null) {
+      widget.decoration.onTapDown!(details);
+    }
+  }
+
+  Offset? _doubleTapPosition;
+
+  void _handleDoubleTapDown(TapDownDetails details) {
+    _doubleTapPosition = details.localPosition;
+  }
+
+  void _onDoubleTap() {
+    if (widget.decoration.onDoubleTap != null) {
+      widget.decoration.onDoubleTap!();
+      return;
+    }
+
+    final targetScale = scale == widget.scaleBoundaries.minScale
+        ? widget.scaleBoundaries.maxScale
+        : widget.scaleBoundaries.minScale;
+
+    _animateScale(scale, targetScale);
+
+    if (targetScale == widget.scaleBoundaries.minScale) {
+      // If zooming out, center the image
+      const center = Offset.zero;
+      _animatePosition(position, center);
+    } else if (_doubleTapPosition != null) {
+      // If zooming in, use the tap position as focal point
+      final tapPosition = _doubleTapPosition!;
+
+      // Get the screen dimensions
+      final viewSize = widget.scaleBoundaries.outerSize;
+
+      // Calculate the current offset of the image relative to the screen center
+      final imageOffset = position;
+
+      // Calculate the position of the tap relative to the image
+      // This is the key calculation - we're getting where on the image the user tapped
+      final tapPositionRelativeToImage =
+          tapPosition - (viewSize.center(Offset.zero) + imageOffset);
+
+      // Scale this relative position for our target scale
+      final scaleFactor = targetScale / scale;
+      final tapPositionScaled = tapPositionRelativeToImage * scaleFactor;
+
+      // Calculate the new offset that places the tap point at the same screen position
+      final newOffset =
+          tapPosition - (viewSize.center(Offset.zero) + tapPositionScaled);
+
+      // Apply position with edge constraints
+      _animatePosition(position,
+          _edgeDetector.clampPosition(position: newOffset, scale: targetScale));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -298,15 +361,19 @@ class PhotoViewCoreState extends State<PhotoViewCore>
 
         return Listener(
           onPointerSignal: _onPointerSignal,
-          child: PhotoViewGestureDetector(
-            behavior: widget.decoration.gestureDetectorBehavior,
-            edgeDetector: _edgeDetector,
-            onScaleStart: _onScaleStart,
-            onScaleUpdate: _onScaleUpdate,
-            onScaleEnd: _onScaleEnd,
-            onTapUp: widget.decoration.onTapUp,
-            onTapDown: widget.decoration.onTapDown,
-            child: child,
+          child: GestureDetector(
+            onDoubleTapDown: _handleDoubleTapDown,
+            onDoubleTap: _onDoubleTap,
+            child: PhotoViewGestureDetector(
+              behavior: widget.decoration.gestureDetectorBehavior,
+              edgeDetector: _edgeDetector,
+              onScaleStart: _onScaleStart,
+              onScaleUpdate: _onScaleUpdate,
+              onScaleEnd: _onScaleEnd,
+              onTapUp: _onTapUp,
+              onTapDown: _onTapDown,
+              child: child,
+            ),
           ),
         );
       },

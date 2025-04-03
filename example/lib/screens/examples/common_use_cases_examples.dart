@@ -178,6 +178,19 @@ class CommonUseCasesExamples extends StatelessWidget {
               );
             },
           ),
+          ExampleButtonNode(
+            title: "Double Tap to Zoom",
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DoubleTapZoomWrapper(
+                    imageProvider: AssetImage("assets/large-image.jpg"),
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
@@ -205,6 +218,39 @@ class OneTapWrapper extends StatelessWidget {
           },
           child: PhotoView(
             imageProvider: imageProvider,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DoubleTapZoomWrapper extends StatelessWidget {
+  const DoubleTapZoomWrapper({
+    super.key,
+    required this.imageProvider,
+  });
+
+  final ImageProvider imageProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Double Tap to Zoom"),
+      ),
+      body: Container(
+        constraints: BoxConstraints.expand(
+          height: MediaQuery.of(context).size.height,
+        ),
+        child: PhotoView(
+          imageProvider: imageProvider,
+          minScale: PhotoViewScale.contained(),
+          maxScale: PhotoViewScale.covered() * 2.0,
+          decoration: const PhotoViewDecoration(
+            backgroundDecoration: BoxDecoration(
+              color: Colors.black,
+            ),
           ),
         ),
       ),

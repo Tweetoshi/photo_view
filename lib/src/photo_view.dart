@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/src/core/photo_view_core.dart';
@@ -26,6 +27,7 @@ class PhotoViewDecoration {
     this.onTapUp,
     this.onTapDown,
     this.onScaleEnd,
+    this.onDoubleTap,
     this.heroAttributes,
     this.backgroundDecoration = const BoxDecoration(color: Color(0xff000000)),
     this.gestureDetectorBehavior = HitTestBehavior.deferToChild,
@@ -42,6 +44,7 @@ class PhotoViewDecoration {
   final GestureTapUpCallback? onTapUp;
   final GestureTapDownCallback? onTapDown;
   final GestureScaleEndCallback? onScaleEnd;
+  final GestureDoubleTapCallback? onDoubleTap;
 
   final PhotoViewHeroAttributes? heroAttributes;
   final BoxDecoration backgroundDecoration;
