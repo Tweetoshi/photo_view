@@ -191,18 +191,26 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     _scaleAnimation = Tween<double>(
       begin: from,
       end: to,
-    ).animate(_scaleAnimationController);
+    ).animate(CurvedAnimation(
+      parent: _scaleAnimationController,
+      curve: Curves.easeInOut,
+    ));
     _scaleAnimationController
+      ..duration = const Duration(milliseconds: 250)
       ..value = 0.0
-      ..fling(velocity: 0.4);
+      ..forward();
   }
 
   void _animatePosition(Offset from, Offset to) {
     _positionAnimation = Tween<Offset>(begin: from, end: to)
-        .animate(_positionAnimationController);
+        .animate(CurvedAnimation(
+      parent: _positionAnimationController,
+      curve: Curves.easeInOut,
+    ));
     _positionAnimationController
+      ..duration = const Duration(milliseconds: 250)
       ..value = 0.0
-      ..fling(velocity: 0.4);
+      ..forward();
   }
 
   void _onPointerSignal(PointerSignalEvent event) {
