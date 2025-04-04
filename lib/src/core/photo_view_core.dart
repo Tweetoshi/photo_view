@@ -264,7 +264,7 @@ class PhotoViewCoreState extends State<PhotoViewCore>
     }
 
     final targetScale = scale == widget.scaleBoundaries.minScale
-        ? widget.scaleBoundaries.maxScale
+        ? widget.scaleBoundaries.maxScale * 0.8
         : widget.scaleBoundaries.minScale;
 
     _animateScale(scale, targetScale);
